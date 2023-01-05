@@ -1,0 +1,34 @@
+version: '3.9'
+
+services:
+
+  sqldb:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    container_name: "DATABASE_SQLSERVER"
+    environment:
+      - SA_PASSWORD=G@lic1aS3guros
+      - ACCEPT_EULA=Y
+      - TZ=America/Argentina/Buenos_Aires
+    ports:
+      - "5433:1433"
+    volumes:
+      - blackwell_sqldata:/var/opt/mssql
+
+  mongodb:
+    image: mongo:5.0
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=AzureDiamond
+      - MONGO_INITDB_ROOT_PASSWORD=hunter2
+  api:
+    image: ${DOCKER_REGISTRY-}blackwellapi
+    container_name: "SERVICE_API"
+    build:
+      context: .
+      dockerfile: src/BlackWell.API/Dockerfile
+    ports:
+      - "8000:80"
+    depends_on:
+      - sqldb  
+volumes:
+  blackwell_sqldata:
+    external: false      
